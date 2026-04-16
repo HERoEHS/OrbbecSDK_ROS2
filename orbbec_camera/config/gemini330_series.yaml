@@ -24,8 +24,8 @@ orbbec_ros:
 
         color:
             enable_color: true
-            color_qos: "default"
-            color_camera_info_qos: "default"
+            color_qos: "sensor_data"
+            color_camera_info_qos: "sensor_data"
             color_width: 0
             color_height: 0
             color_fps: 0
@@ -42,8 +42,8 @@ orbbec_ros:
 
         depth:
             enable_depth: true
-            depth_qos: "default"
-            depth_camera_info_qos: "default"
+            depth_qos: "sensor_data"
+            depth_camera_info_qos: "sensor_data"
             depth_width: 0
             depth_height: 0
             depth_fps: 0

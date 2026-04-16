@@ -441,8 +441,11 @@ class OBCameraNode {
 
   std::shared_ptr<ob::Frame> decodeIRMJPGFrame(const std::shared_ptr<ob::Frame>& frame);
 
+  // override_timestamp_us: enable_frame_sync 활성 시 depth 타임스탬프로 통일하기 위한 오버라이드 값.
+  // 0이면 프레임 자체 타임스탬프 사용.
   void onNewFrameCallback(const std::shared_ptr<ob::Frame>& frame,
-                          const stream_index_pair& stream_index);
+                          const stream_index_pair& stream_index,
+                          uint64_t override_timestamp_us = 0);
 
   void publishMetadata(const std::shared_ptr<ob::Frame>& frame,
                        const stream_index_pair& stream_index, const std_msgs::msg::Header& header);

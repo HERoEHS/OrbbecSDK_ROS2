@@ -3352,7 +3352,27 @@ void OBCameraNode::onNewColorFrameCallback() {
     }
     std::shared_ptr<ob::FrameSet> frameSet = color_frame_queue_.front();
     is_color_frame_decoded_ = decodeColorFrameToBuffer(frameSet->colorFrame(), rgb_buffer_);
-    onNewFrameCallback(frameSet->colorFrame(), COLOR);
+
+    // FrameSet 내 depth 타임스탬프로 color 통일 (동일 캡처 사이클의 보고 오차 제거)
+    uint64_t unified_ts = 0;
+    auto depth_frame = frameSet->depthFrame();
+    if (depth_frame && frameSet->colorFrame()) {
+      auto depth_ts = getFrameTimestampUs(depth_frame);
+      auto color_ts = getFrameTimestampUs(frameSet->colorFrame());
+      auto diff_us = (depth_ts > color_ts) ? (depth_ts - color_ts) : (color_ts - depth_ts);
+      // 30fps 기준 1프레임=33ms. 동일 캡처 사이클 내 센서 간 오프셋은 최대 ~17ms 관측.
+      // 임계값을 프레임 주기의 약 2/3(22ms)로 설정하여 다음 프레임과 혼동 방지.
+      if (diff_us <= 22000) {
+        unified_ts = depth_ts;
+        RCLCPP_INFO_ONCE(logger_,
+            "Color-Depth timestamp unified (diff=%.2fms)", static_cast<double>(diff_us) / 1000.0);
+      } else {
+        RCLCPP_WARN_THROTTLE(logger_, *node_->get_clock(), 3000,
+            "Color-Depth timestamp diff too large (%.2fms), skipping unification",
+            static_cast<double>(diff_us) / 1000.0);
+      }
+    }
+    onNewFrameCallback(frameSet->colorFrame(), COLOR, unified_ts);
     publishPointCloud(frameSet);
     color_frame_queue_.pop();
   }
@@ -3577,7 +3597,8 @@ std::shared_ptr<ob::Frame> OBCameraNode::decodeIRMJPGFrame(
 }
 
 void OBCameraNode::onNewFrameCallback(const std::shared_ptr<ob::Frame> &frame,
-                                      const stream_index_pair &stream_index) {
+                                      const stream_index_pair &stream_index,
+                                      uint64_t override_timestamp_us) {
   if (frame == nullptr) {
     return;
   }
@@ -3621,7 +3642,8 @@ void OBCameraNode::onNewFrameCallback(const std::shared_ptr<ob::Frame> &frame,
   }
   int width = static_cast<int>(video_frame->getWidth());
   int height = static_cast<int>(video_frame->getHeight());
-  auto frame_timestamp = getFrameTimestampUs(frame);
+  // override_timestamp_us > 0이면 depth 타임스탬프로 통일 (enable_frame_sync 활성 시)
+  auto frame_timestamp = (override_timestamp_us > 0) ? override_timestamp_us : getFrameTimestampUs(frame);
   auto timestamp = fromUsToROSTime(frame_timestamp);
   if (!device_) {
     RCLCPP_ERROR_STREAM(logger_, "device is null in onNewFrameCallback");

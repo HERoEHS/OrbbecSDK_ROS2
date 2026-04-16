@@ -91,8 +91,8 @@ def generate_launch_description():
         DeclareLaunchArgument('color_fps', default_value='0'),
         DeclareLaunchArgument('color_format', default_value='ANY'),
         DeclareLaunchArgument('enable_color', default_value='true'),
-        DeclareLaunchArgument('color_qos', default_value='default'),
-        DeclareLaunchArgument('color_camera_info_qos', default_value='default'),
+        DeclareLaunchArgument('color_qos', default_value='sensor_data'),
+        DeclareLaunchArgument('color_camera_info_qos', default_value='sensor_data'),
         DeclareLaunchArgument('enable_color_auto_exposure_priority', default_value='false'),
         DeclareLaunchArgument('color_rotation', default_value='-1'),#color rotation degree : 0, 90, 180, 270
         DeclareLaunchArgument('color_flip', default_value='false'),
@@ -125,8 +125,8 @@ def generate_launch_description():
         DeclareLaunchArgument('depth_fps', default_value='0'),
         DeclareLaunchArgument('depth_format', default_value='ANY'),
         DeclareLaunchArgument('enable_depth', default_value='true'),
-        DeclareLaunchArgument('depth_qos', default_value='default'),
-        DeclareLaunchArgument('depth_camera_info_qos', default_value='default'),
+        DeclareLaunchArgument('depth_qos', default_value='sensor_data'),
+        DeclareLaunchArgument('depth_camera_info_qos', default_value='sensor_data'),
         DeclareLaunchArgument('enable_depth_auto_exposure_priority', default_value='false'),
         DeclareLaunchArgument('depth_precision', default_value=''),
         DeclareLaunchArgument('depth_rotation', default_value='-1'),#depth rotation degree : 0, 90, 180, 270
@@ -354,8 +354,18 @@ def generate_launch_description():
                 ])
             ]
 
+    static_tf_node = Node(
+        package='tf2_ros',
+        executable='static_transform_publisher',
+        arguments=['--x', '-0.04', '--y', '0.02', '--z', '0',
+                   '--roll', '0', '--pitch', '0', '--yaw', '3.14',
+                   '--frame-id', 'zed_camera_link',
+                   '--child-frame-id', 'camera_link'],
+    )
+
     return LaunchDescription(
         args + [
-            OpaqueFunction(function=lambda context: create_node_action(context, args))
+            OpaqueFunction(function=lambda context: create_node_action(context, args)),
+            static_tf_node,
         ]
     )
