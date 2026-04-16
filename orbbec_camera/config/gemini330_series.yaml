@@ -28,7 +28,7 @@ orbbec_ros:
             color_camera_info_qos: "sensor_data"
             color_width: 0
             color_height: 0
-            color_fps: 0
+            color_fps: 15
             color_format: "ANY"
             enable_color_auto_white_balance: true
             color_white_balance: -1
@@ -46,7 +46,7 @@ orbbec_ros:
             depth_camera_info_qos: "sensor_data"
             depth_width: 0
             depth_height: 0
-            depth_fps: 0
+            depth_fps: 15
             depth_format: "ANY"
             depth_registration: true
             align_mode: "SW"
