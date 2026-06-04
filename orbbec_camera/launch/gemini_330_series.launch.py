@@ -359,7 +359,7 @@ def generate_launch_description():
         executable='static_transform_publisher',
         arguments=['--x', '-0.04', '--y', '0.02', '--z', '0',
                    '--roll', '0', '--pitch', '0', '--yaw', '3.14',
-                   '--frame-id', 'zed_camera_link',
+                   '--frame-id', 'zed_cam_link',
                    '--child-frame-id', 'camera_link'],
     )
 
