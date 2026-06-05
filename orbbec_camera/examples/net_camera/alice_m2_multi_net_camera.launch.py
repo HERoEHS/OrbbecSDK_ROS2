@@ -22,6 +22,7 @@ def generate_launch_description():
             "device_num": "1",
             "sync_mode": "standalone",
             "device_access_mode": "EA",
+            "color_format": "ANY",    # Y8 - gray scale, ANY - auto
             "enable_point_cloud": "true",
             "enable_accel": "true",
             "enable_gyro": "true",
@@ -45,6 +46,7 @@ def generate_launch_description():
             "device_num": "1",
             "sync_mode": "standalone",
             "device_access_mode": "EA",
+            "color_format": "ANY",    # Y8 - gray scale, ANY - auto
             "enable_point_cloud": "true",
             "enable_accel": "true",
             "enable_gyro": "true",
