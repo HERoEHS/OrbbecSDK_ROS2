@@ -357,9 +357,9 @@ def generate_launch_description():
     static_tf_node = Node(
         package='tf2_ros',
         executable='static_transform_publisher',
-        arguments=['--x', '-0.04', '--y', '0.02', '--z', '0',
-                   '--roll', '0', '--pitch', '0', '--yaw', '3.14',
-                   '--frame-id', 'zed_cam_link',
+        arguments=['--x', '0.0', '--y', '0.0', '--z', '0.0',
+                   '--roll', '0', '--pitch', '0', '--yaw', '0.0',
+                   '--frame-id', 'base_footprint',
                    '--child-frame-id', 'camera_link'],
     )
 
