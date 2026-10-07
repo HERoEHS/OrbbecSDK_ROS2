@@ -355,7 +355,9 @@ def generate_launch_description():
                 ])
             ]
 
-    # publish_mount_tf: 카메라 장착 TF 를 다른 노드(URDF·외부 TF 발행기)가 내면 false.
+    # publish_mount_tf: base_footprint → camera_link 영점 static TF. 기본 false —
+    # 장착 TF 는 aeirobot_orbbec_camera 런치(M1 gemini_camera·M2 m2_camera)가 yaml 값으로 직접 낸다.
+    # 이 런치를 직접 부르며 예전 영점 TF 에 기대는 곳(alice_simulation capture_orbbec_env.sh 등)은 publish_mount_tf:=true.
     # args 밖에서 선언한다 — args 안이면 load_parameters 가 드라이버 ROS 파라미터로 넘긴다.
     static_tf_node = Node(
         package='tf2_ros',
@@ -369,7 +371,7 @@ def generate_launch_description():
 
     return LaunchDescription(
         args + [
-            DeclareLaunchArgument('publish_mount_tf', default_value='true'),
+            DeclareLaunchArgument('publish_mount_tf', default_value='false'),
             OpaqueFunction(function=lambda context: create_node_action(context, args)),
             static_tf_node,
         ]
