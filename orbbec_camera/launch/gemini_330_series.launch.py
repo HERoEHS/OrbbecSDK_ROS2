@@ -2,6 +2,7 @@ import os
 import yaml
 from launch import LaunchDescription
 from launch.actions import DeclareLaunchArgument, OpaqueFunction, GroupAction
+from launch.conditions import IfCondition
 from launch.substitutions import LaunchConfiguration
 from launch_ros.actions import PushRosNamespace, ComposableNodeContainer, Node
 from launch_ros.descriptions import ComposableNode
@@ -354,6 +355,8 @@ def generate_launch_description():
                 ])
             ]
 
+    # publish_mount_tf: 카메라 장착 TF 를 다른 노드(URDF·외부 TF 발행기)가 내면 false.
+    # args 밖에서 선언한다 — args 안이면 load_parameters 가 드라이버 ROS 파라미터로 넘긴다.
     static_tf_node = Node(
         package='tf2_ros',
         executable='static_transform_publisher',
@@ -361,10 +364,12 @@ def generate_launch_description():
                    '--roll', '0', '--pitch', '0', '--yaw', '0.0',
                    '--frame-id', 'base_footprint',
                    '--child-frame-id', 'camera_link'],
+        condition=IfCondition(LaunchConfiguration('publish_mount_tf')),
     )
 
     return LaunchDescription(
         args + [
+            DeclareLaunchArgument('publish_mount_tf', default_value='true'),
             OpaqueFunction(function=lambda context: create_node_action(context, args)),
             static_tf_node,
         ]
